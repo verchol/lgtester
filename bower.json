@@ -1,0 +1,7 @@
+{
+  "name": "digital-clock",
+  "version": "0.0.0",
+  "dependencies": {
+    "backgrid": "~0.3.5"
+  }
+}
