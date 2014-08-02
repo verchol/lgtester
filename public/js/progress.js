@@ -5,17 +5,22 @@
 **************************************/
 
 // connect to our socket server
-var socket;  
+var socket;
 
 var app = app || {};
 
 
 // shortcut for document.ready
 $(function(){
-
+function getHost(){
+	if (!window) throw "window object is not defined";
+	return window.location.host;
+}
 var loc = window.location;
-var host = "http://127.0.0.1:1337";
+var localHost = "http://127.0.0.1:1337";
+var host  = getHost()
 var socket = io.connect(host);
+
 	//setup some common vars
 	var $blastField = $('#blast'),
 	    $clearOld= $('#clearOld');
@@ -26,8 +31,8 @@ var socket = io.connect(host);
 	    $stopNew = $('#stopNew');
 	    $startOld = $('#starOld');
 	    $startNew = $('#startNew');
- 
- 
+
+
 
 $stopOld.click(function()
 {
@@ -47,20 +52,20 @@ $startNew.click(function()
 })
 
 $clearOld.click(function(){
-   oldController.setValue(0); 
+   oldController.setValue(0);
    oldController.startTime = new Date();
 
 });
 $clearNew.click(function(){
-   newController.setValue(0); 
+   newController.setValue(0);
    newController.startTime = new Date();
 
 });
- 
+
  oldController.timer = $clockOld;
  newController.timer = $clockNew;
  var recordId = 0;
- 
+
  function stop(data)
  {
  	        clearTimeout(this.timerId);
@@ -69,7 +74,7 @@ $clearNew.click(function(){
  }
 
  function start(data)
- {           
+ {
  	       var controller = this;
 
  	       if (data.status === "started")
@@ -79,24 +84,24 @@ $clearNew.click(function(){
 			controller.setValue(0);
 			controller.startTime = new Date();
 			controller.recordTimer = app.recordApi.start(controller);
-             
+
 			var counter  = function(){
 				if (!(controller.status === "started")) return;
 
 				var d = new Date();
 				var gap = (d - controller.startTime)/1000;
 				gap = Math.floor(gap);
-                var gapSec  = Math.floor(gap % 60) 
-                var gapMin = Math.floor(gap / 60) 
+                var gapSec  = Math.floor(gap % 60)
+                var gapMin = Math.floor(gap / 60)
              //   console.log(gapMin + ":" + gapSec);
                 function len (g)
                 {
                 	if (g.toString().length < 2)
                           return  "0" + g.toString();
-                    else 
+                    else
                     return g.toString();
                 }
-                  
+
                 controller.timer.html('<h1>' + len(gapMin) + ":" + len(gapSec) + '</h1>');
 
                 if (controller.status !== "stopped")
@@ -106,7 +111,7 @@ $clearNew.click(function(){
 			counter();
  }
 
- 
+
  newController.stop = stop;
  oldController.stop = stop;
  newController.start = start;
@@ -121,12 +126,12 @@ $clearNew.click(function(){
 		 	return;
 		 }
 
-	     if (this.status && this.status === "started" &&  data.command === "add") 
+	     if (this.status && this.status === "started" &&  data.command === "add")
 				controller.add(1);
-  
+
 	  	if (data.command === "start")
-	 	    controller.start(data);        
-     
+	 	    controller.start(data);
+
  }
 
     var oldLogic = $.proxy(logic , oldController);
@@ -135,13 +140,13 @@ $clearNew.click(function(){
 	//SOCKET STUFF
 	socket.on("old", function(data){
 			oldLogic(data);
-		 
+
 	});
 	socket.on("new", function(data){
          newLogic(data);
-		 
+
 	});
-	
-	 
-	
+
+
+
 });
